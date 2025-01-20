@@ -1,12 +1,11 @@
 import requests
 from googleapiclient.discovery import build
-from google.oauth2.service_account import Credentials
 from dotenv import load_dotenv
 import os
 import datetime
 
-def authenticate(credentials):
-    return build('sheets', 'v4', credentials=credentials).spreadsheets()
+def authenticate(API_KEY):
+    return build('sheets', 'v4', developerKey=API_KEY).spreadsheets()
 
 def get_column(day):
     column = day + ord('A')
@@ -34,28 +33,20 @@ if __name__ == '__main__':
     day = date_time.day
 
     SPREADSHEET_ID = '1Rc4COG0KWkeBh3MiIOIMONoCtCt1O9GjAHsNjjTAtNs'
-    RANGE_NAME = get_range_name(day)
+    RANGE_NAME = "Jan 25!A2:A23"
     API_KEY = os.getenv('API_KEY')
 
-    print(RANGE_NAME)
-    credentials = Credentials.from_service_account_file('key.json')
-    service = authenticate(credentials=credentials)
-    request_body = {
-        "dataFilters": [
-            {
-                "developerMetadataLookup": {
-                    
-                }
-            }
-        ]
-    }
-    metadata = service.developerMetadata().search(spreadsheetId=SPREADSHEET_ID, body=request_body).execute()
-    print(metadata)
+    print(API_KEY)
 
+    print(RANGE_NAME)
+
+    service = authenticate(API_KEY=API_KEY)
     result = service.values().get(spreadsheetId=SPREADSHEET_ID, range=RANGE_NAME).execute()
     values = result.get('values', [])
     if not values:
         print('No data found.')
     else:
+        print('[', end='')
         for row in values:
-            print(row)
+            print('("'+row[0]+'", "A"', end='), ')
+        print(']')

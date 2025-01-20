@@ -1,12 +1,14 @@
 from flask import Blueprint, request, jsonify, render_template, redirect, url_for
 from . import db
-from .models import Attendance, Holidays, Users
-from datetime import datetime
+from .models import Attendance, Holidays, Users, Employees, Leaves
+from datetime import datetime, date
+from dateutil.rrule import rrule, DAILY
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired
 import bcrypt
+from calendar import monthrange
 
 # Create a Blueprint for routes
 attendance_bp = Blueprint("attendance", __name__)
@@ -28,6 +30,19 @@ def is_holiday():
     first = Holidays.query.filter_by(date=today).first() is not None # Check if today is a special holiday
     second = today.weekday() == 4 or today.weekday() == 5 # Friday or Saturday
     return first or second
+
+def get_fine(count):
+    if count == 0:
+        return 100
+    fine = 0
+    if count > 8:
+        fine = (count - 8) * 500 + 1200
+    elif count > 4:
+        fine = (count - 4) * 300 + 400
+    else:
+        fine = count * 100
+
+    return fine
 
 @attendance_bp.route("/", methods=["GET"])
 def index():
@@ -97,17 +112,31 @@ def add_attendance():
 def get_attendance_by_month(year, month):
     try:
         # Fetch records for the specific month and year
-        records = Attendance.query.filter(
-            db.extract("year", Attendance.date) == year,
-            db.extract("month", Attendance.date) == month
-        ).all()
+        emplpyees = Employees.query.all()
 
         # Return the results
-        return jsonify([
-            {"id": record.id, "name": record.name, "date": str(record.date), "isPresent": record.isPresent}
-            for record in records
-        ]), 200
+        final_result = []
+        today = datetime.now().date()
+        for i in range(len(emplpyees)):
+            temp = []
+            temp.append(emplpyees[i].name)
+            start = date(year, month, 1)
+            end = date(year, month, monthrange(year, month)[1])
+            for dt in rrule(DAILY, dtstart=start, until=end):
+                dt = dt.date()
+                if Holidays.query.filter_by(date=dt).first() is not None:
+                    temp.append("H")
+                elif Leaves.query.filter_by(date=dt, employee_id=emplpyees[i].id).first() is not None:
+                    temp.append("L")
+                else:
+                    attendance = Attendance.query.filter_by(date=dt, employee_id=emplpyees[i].id).first()
+                    temp.append("Not yet" if today < dt else "A" if attendance is None else "A" if attendance.isPresent else "P")
+            temp.append(get_fine(temp.count("A")))
+            final_result.append(temp)
+
+        return jsonify(final_result), 200
     except Exception as e:
+        print(e)
         return jsonify({"error": str(e)}), 500
 
 # API to add a new holiday
@@ -155,3 +184,12 @@ def add_holiday():
 #         return jsonify({"message": "User exists!"}), 200
 #     else:
 #         return jsonify({"error": "User does not exist!"}), 404
+
+# @attendance_bp.route("/add_employees", methods=["GET"])
+# def add_employees():
+#     employees = [("RASHED", "A"), ("ARSIL", "B"), ("ASIF PARTHO", "A"), ("SUJAN", "B"), ("ARIF", "A"), ("MOBARAK", "A"), ("ZOHA", "A"), ("ASIF MIMI RABBI", "A"), ("TUSHAR", "A"), ("TALAT", "A"), ("TAWSIF", "A"), ("TARIF", "A"), ("IKRAMUL MURAD", "A"), ("SAMIN", "B"), ("SHAYANUL HAQ SADI", "A"), ("MD AZIZUR RAHMAN", "A"), ("ASIF NEWAZ", "A"), ("Fahim", "A"), ("Hasib", "B"), ("Noor", "A"), ("Rafi", "A"), ("Abdullah", "A")]
+#     for employee in employees:
+#         new_employee = Employees(name=employee[0], time_slot=employee[1])
+#         db.session.add(new_employee)
+#     db.session.commit()
+#     return jsonify({"message": "Employees added successfully!"}), 201
