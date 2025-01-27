@@ -10,8 +10,9 @@
             <!-- Bootstrap CSS -->
             {{ bootstrap.load_css(version="5") }}
         {% endblock %}
-
-        <title>Your page title</title>
+        {% block title %}
+            <title>Attendance Tracker</title>
+        {% endblock %}
         {% endblock %}
     </head>
     <body>

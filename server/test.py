@@ -403,7 +403,7 @@ if __name__ == '__main__':
     #         }
     #     ]
     # }
-    employees = [("RASHED", "A"), ("ARSIL", "B"), ("ASIF PARTHO", "A"), ("SUJAN", "B"), ("ARIF", "A"), ("MOBARAK", "A"), ("ZOHA", "A"), ("ASIF MIMI RABBI", "A"), ("TUSHAR", "A"), ("TALAT", "A"), ("TAWSIF", "A"), ("TARIF", "A"), ("IKRAMUL MURAD", "A"), ("SAMIN", "B"), ("SHAYANUL HAQ SADI", "A"), ("MD AZIZUR RAHMAN", "A"), ("ASIF NEWAZ", "A"), ("Fahim", "A"), ("Hasib", "B"), ("Noor", "A"), ("Rafi", "A"), ("Abdullah", "A")]
+    employees = [("RASHED", "A"), ("ARSIL", "B"), ("ASIF PARTHO", "A"), ("SUJAN", "B"), ("ARIF", "A"), ("MOBARAK", "A"), ("ZOHA", "A"), ("ASIF MIMI RABBI", "A"), ("TUSHAR", "B"), ("TALAT", "A"), ("TAWSIF", "A"), ("TARIF", "A"), ("IKRAMUL MURAD", "A"), ("SAMIN", "B"), ("SHAYANUL HAQ SADI", "A"), ("MD AZIZUR RAHMAN", "A"), ("ASIF NEWAZ", "A"), ("Fahim", "A"), ("Hasib", "B"), ("Noor", "A"), ("Rafi", "A"), ("Abdullah", "A")]
     employees = [employee[0] for employee in employees]
     start_date = date(2025, 2, 1)
     end_date = date(2025, 2, monthrange(2025, 2)[1])

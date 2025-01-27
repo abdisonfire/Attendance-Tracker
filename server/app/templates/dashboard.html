@@ -1,10 +1,73 @@
 {% extends "base.html" %}
 
-{% block title %}Dashboard{% endblock %}
+{% block title %}<title>Dashboard</title>{% endblock %}
 
 {% block content %}
-    <div style="text-align: center;">
+    <div class="my-5" style="text-align: center;">
         <h1>Welcome to Attendance Tracker (iOS)</h1>
         <h3>Dashboard</h3>
+        <div class="container text-center my-5">
+            <div class="row justify-content-center">
+                <div class="dropdown col col-2">
+                    <select id="year" class="form-select" aria-label="Default select example">
+                        <option value="NULL" selected>Year</option>
+                        <option value="2025">2025</option>
+                        <option value="2026">2026</option>
+                        <option value="2027">2027</option>
+                        <option value="2028">2028</option>
+                        <option value="2029">2029</option>
+                        <option value="2030">2030</option>
+                      </select>
+                </div>
+    
+                <div class="dropdown col col-2">
+                    <select id="month" class="form-select" aria-label="Default select example">
+                        <option value="NULL" selected>Month</option>
+                        <option value="01">January</option>
+                        <option value="02">February</option>
+                        <option value="03">March</option>
+                        <option value="04">April</option>
+                        <option value="05">May</option>
+                        <option value="06">June</option>
+                        <option value="07">July</option>
+                        <option value="08">August</option>
+                        <option value="09">September</option>
+                        <option value="10">October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
+                    </select>
+                </div>
+    
+                <div class="col col-1">
+                    <button onclick="goFunc()" class="btn btn-primary">
+                        Go
+                    </button>
+                </div>
+                {% block update_button %}{% endblock %}
+                <div class="col col-1">
+                    <a href="/logout" class="btn btn-danger">Logout</a>
+                </div>
+            </div>
+        </div>
     </div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script>
+
+        function goFunc() {
+            var year = document.getElementById("year").value;
+            var month = document.getElementById("month").value;
+            if (year == "NULL" || month == "NULL") {
+                alert("Please select a year and a month");
+            } else if(year === "2025" && month === "01"){
+                alert("Please select a date starting from February 2025");
+            }
+            else {
+                window.location.href = "/dashboard/" + year + "/" + month;
+            }
+        }
+
+    </script>
 {% endblock %}

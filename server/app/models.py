@@ -20,7 +20,8 @@ class Holidays(db.Model):
     __tablename__ = "holidays"
     
     id = db.Column(db.Integer, primary_key=True)  # Auto-incrementing ID
-    date = db.Column(db.Date, nullable=False)  # Date of the holiday
+    #data must be unique
+    date = db.Column(db.Date, nullable=False, unique=True)  # Date of the holiday
 
 class Users(db.Model, UserMixin):
     __tablename__ = "users"
@@ -35,3 +36,10 @@ class Leaves(db.Model):
     id = db.Column(db.Integer, primary_key=True)  # Auto-incrementing ID
     employee_id = db.Column(db.Integer, db.ForeignKey("employees.id"), nullable=False)  # Employee ID
     date = db.Column(db.Date, nullable=False)  # Date of leave
+
+class Sheets(db.Model):
+    __tablename__ = "sheets"
+    
+    id = db.Column(db.Integer, primary_key=True)  # Auto-incrementing ID
+    sheet_id = db.Column(db.String(255), nullable=False, unique=True)  # Sheet ID
+    sheet_name = db.Column(db.String(255), nullable=False, unique=True)  # Sheet name

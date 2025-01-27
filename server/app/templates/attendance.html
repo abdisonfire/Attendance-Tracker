@@ -1,0 +1,127 @@
+{% extends "dashboard.html" %}
+
+{% block update_button %}
+
+    <div class="col col-1">
+        <a href="/update/{{data['year']}}/{{data['month']}}" class="btn btn-primary">Update</a>
+    </div>
+
+{% endblock %}
+
+
+{% block content %}
+    {{ super() }}
+
+    {% if data["isCreated"] %}
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col" style="overflow: scroll;">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr style="text-align: center;">
+                            <th scope="col">Name</th>
+                            {% for date in data["dates"] %}
+                                <th scope="col">{{ date }}</th>
+                            {% endfor %}
+                            <th scope="col">Fine</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- {% print(data["employees"]) %} -->
+                        {% for employee in data["employees"] %}
+                            <tr style="text-align: center;">
+                                <td>{{ employee["employee_name"] }}</td>
+                                {% for attendance in employee["attendance"] %}
+                                    <td>
+                                        {% if attendance == "P" %}
+                                            <span class="badge bg-success">P</span>
+                                        {% elif attendance == "A" %}
+                                            <span class="badge bg-danger">A</span>
+                                        {% elif attendance == "L" %}
+                                            <span class="badge bg-warning">L</span>
+                                        {% elif attendance == "H" %}
+                                            <span class="badge bg-info">H</span>
+                                        {% else %}
+                                            <span></span>
+                                        {% endif %}
+                                    </td>
+                                {% endfor %}
+                                <td>{{ employee["fine"] }}</td>
+                            </tr>
+                            
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <h3>Add Special Holiday</h3>
+        </div>
+
+        <div class="row">
+            <div class="col col-4">
+                <form action="/add_holiday/{{data['year']}}/{{data['month']}}" method="POST">
+                    <div class="mb-3">
+                        <label for="date" class="form-label">Date</label>
+                        <input type="date" class="form-control" id="date" name="date" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <h3>Holidays</h3>
+        </div>
+        <div class="row">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">Date</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for holiday in data["holidays"] %}
+                        <tr>
+                            <td>{{ holiday }}</td>
+                            <td>
+                                <a href="/remove_holiday/{{ holiday.year }}/{{ holiday.month }}/{{ holiday.day }}" class="btn btn-danger">Delete</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {% else %}
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col">
+                <h4>Sheet not found. <a href="/create_sheet/{{ data['year'] }}/{{ '0' if data['month'] < 10 else '' }}{{ data['month'] }}">Create now</a> </h4>
+                
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    
+
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script>
+        var data = JSON.parse('{{ data | tojson | safe }}')
+        console.log(data["year"] - 2025)
+        document.getElementById("year").selectedIndex = data["year"] - 2025 + 1
+        document.getElementById("month").selectedIndex = data["month"]
+    </script>
+    
+{% endblock %}
